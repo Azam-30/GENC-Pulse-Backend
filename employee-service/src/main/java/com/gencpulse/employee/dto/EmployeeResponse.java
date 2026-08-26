@@ -23,12 +23,21 @@ public class EmployeeResponse {
 
     private String role;
 
+    private String designation;
+
+    private String technology;
+
+    private String location;
+
+    private String batch;
+
     private String managerName;
 
     private String projectName;
 
     private Boolean active;
-    
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 }

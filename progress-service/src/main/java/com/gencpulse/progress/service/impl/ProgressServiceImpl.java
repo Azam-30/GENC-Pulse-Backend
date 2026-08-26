@@ -29,9 +29,12 @@ public class ProgressServiceImpl implements ProgressService {
             ProgressRequest request) {
 
         try {
+
             employeeFeignClient.getEmployeeById(
                     request.getEmployeeId());
+
         } catch (Exception ex) {
+
             throw new RuntimeException(
                     "Employee does not exist");
         }
@@ -42,14 +45,25 @@ public class ProgressServiceImpl implements ProgressService {
                         request.getUpdateDate());
 
         if (exists) {
+
             throw new RuntimeException(
                     "Progress already submitted for today");
         }
 
-        Progress progress =
-                mapper.map(
-                        request,
-                        Progress.class);
+        Progress progress = Progress.builder()
+                .employeeId(request.getEmployeeId())
+                .storyId(request.getStoryId())
+                .taskDescription(
+                        request.getTaskDescription())
+                .hoursWorked(
+                        request.getHoursWorked())
+                .status(
+                        request.getStatus())
+                .blockers(
+                        request.getBlockers())
+                .updateDate(
+                        request.getUpdateDate())
+                .build();
 
         Progress savedProgress =
                 repository.save(progress);

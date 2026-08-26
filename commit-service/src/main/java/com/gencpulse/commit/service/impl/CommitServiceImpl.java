@@ -29,7 +29,6 @@ public class CommitServiceImpl implements CommitService {
     public CommitResponse createCommit(
             CommitRequest request) {
 
-        // Validate Employee Exists
         try {
 
             employeeFeignClient.getEmployeeById(
@@ -41,7 +40,6 @@ public class CommitServiceImpl implements CommitService {
                     "Employee does not exist");
         }
 
-        // Prevent Duplicate Commit Hash
         if (repository.existsByCommitHash(
                 request.getCommitHash())) {
 
@@ -49,10 +47,15 @@ public class CommitServiceImpl implements CommitService {
                     "Commit already exists");
         }
 
-        CommitEntity commit =
-                mapper.map(
-                        request,
-                        CommitEntity.class);
+        CommitEntity commit = CommitEntity.builder()
+                .employeeId(request.getEmployeeId())
+                .commitHash(request.getCommitHash())
+                .repositoryName(request.getRepositoryName())
+                .branchName(request.getBranchName())
+                .commitMessage(request.getCommitMessage())
+                .commitLink(request.getCommitLink())
+                .commitDate(request.getCommitDate())
+                .build();
 
         CommitEntity savedCommit =
                 repository.save(commit);
