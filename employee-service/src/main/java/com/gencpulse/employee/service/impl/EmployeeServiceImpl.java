@@ -5,8 +5,11 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import com.gencpulse.employee.client.AuthClient;
 import com.gencpulse.employee.dto.EmployeeRequest;
 import com.gencpulse.employee.dto.EmployeeResponse;
+import com.gencpulse.employee.dto.RegisterRequestDto;
+import com.gencpulse.employee.dto.Role;
 import com.gencpulse.employee.entity.Employee;
 import com.gencpulse.employee.exception.DuplicateResourceException;
 import com.gencpulse.employee.exception.ResourceNotFoundException;
@@ -17,16 +20,22 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class EmployeeServiceImpl implements EmployeeService {
+public class EmployeeServiceImpl
+        implements EmployeeService {
 
     private final EmployeeRepository repository;
+
     private final ModelMapper mapper;
 
+    private final AuthClient authClient;
+
     @Override
-    public EmployeeResponse createEmployee(EmployeeRequest request) {
+    public EmployeeResponse createEmployee(
+            EmployeeRequest request) {
 
         if (repository.findByEmployeeCode(
-                request.getEmployeeCode()).isPresent()) {
+                request.getEmployeeCode())
+                .isPresent()) {
 
             throw new DuplicateResourceException(
                     "Employee Code already exists");
@@ -40,10 +49,59 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         Employee employee =
-                mapper.map(request, Employee.class);
+                mapper.map(
+                        request,
+                        Employee.class);
+
+        employee.setUsername(
+                request.getUsername());
+
+        if (request.getManagerId() != null) {
+
+            Employee manager =
+                    repository.findById(
+                            request.getManagerId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Manager not found"));
+
+            if (!"MANAGER".equalsIgnoreCase(
+                    manager.getRole())) {
+
+                throw new RuntimeException(
+                        "Selected employee is not a manager");
+            }
+
+            employee.setManagerId(
+                    manager.getId());
+
+            employee.setManagerName(
+                    manager.getName());
+        }
 
         Employee savedEmployee =
                 repository.save(employee);
+
+        RegisterRequestDto user =
+                new RegisterRequestDto();
+
+        user.setEmployeeId(
+                savedEmployee.getId());
+
+        user.setUsername(
+                request.getUsername());
+
+        user.setEmail(
+                request.getEmail());
+
+        user.setPassword(
+                request.getPassword());
+
+        user.setRole(
+                Role.valueOf(
+                        request.getRole()));
+
+        authClient.registerUser(user);
 
         return mapper.map(
                 savedEmployee,
@@ -51,7 +109,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeResponse> getAllEmployees() {
+    public List<EmployeeResponse>
+    getAllEmployees() {
 
         return repository.findAll()
                 .stream()
@@ -63,13 +122,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeResponse getEmployeeById(Long id) {
+    public EmployeeResponse
+    getEmployeeById(Long id) {
 
         Employee employee =
                 repository.findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Employee not found with id : " + id));
+                                        "Employee not found with id : "
+                                                + id));
 
         return mapper.map(
                 employee,
@@ -85,7 +146,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 repository.findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Employee not found with id : " + id));
+                                        "Employee not found with id : "
+                                                + id));
 
         employee.setEmployeeCode(
                 request.getEmployeeCode());
@@ -95,6 +157,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employee.setEmail(
                 request.getEmail());
+
+        employee.setUsername(
+                request.getUsername());
 
         employee.setRole(
                 request.getRole());
@@ -111,8 +176,33 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setBatch(
                 request.getBatch());
 
-        employee.setManagerName(
-                request.getManagerName());
+        if (request.getManagerId() != null) {
+
+            Employee manager =
+                    repository.findById(
+                            request.getManagerId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Manager not found"));
+
+            if (!"MANAGER".equalsIgnoreCase(
+                    manager.getRole())) {
+
+                throw new RuntimeException(
+                        "Selected employee is not a manager");
+            }
+
+            employee.setManagerId(
+                    manager.getId());
+
+            employee.setManagerName(
+                    manager.getName());
+        } else {
+
+            employee.setManagerId(null);
+
+            employee.setManagerName(null);
+        }
 
         employee.setProjectName(
                 request.getProjectName());
@@ -135,8 +225,37 @@ public class EmployeeServiceImpl implements EmployeeService {
                 repository.findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Employee not found with id : " + id));
+                                        "Employee not found with id : "
+                                                + id));
 
         repository.delete(employee);
+    }
+
+    @Override
+    public List<EmployeeResponse> getManagers() {
+
+        return repository.findByRole(
+                        "MANAGER")
+                .stream()
+                .map(employee ->
+                        mapper.map(
+                                employee,
+                                EmployeeResponse.class))
+                .toList();
+    }
+
+    @Override
+    public List<EmployeeResponse>
+    getEmployeesByManagerId(
+            Long managerId) {
+
+        return repository.findByManagerId(
+                        managerId)
+                .stream()
+                .map(employee ->
+                        mapper.map(
+                                employee,
+                                EmployeeResponse.class))
+                .toList();
     }
 }

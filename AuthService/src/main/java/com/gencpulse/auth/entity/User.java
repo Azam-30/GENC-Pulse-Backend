@@ -29,4 +29,6 @@ public class User {
     private Role role;
 
     private Boolean active;
+
+    private Long employeeId;
 }

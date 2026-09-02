@@ -31,8 +31,7 @@ public class EmployeeController {
         return ResponseEntity.ok(
                 ApiResponse.<EmployeeResponse>builder()
                         .status("SUCCESS")
-                        .message(
-                           "Employee Created")
+                        .message("Employee Created")
                         .data(response)
                         .build());
     }
@@ -66,6 +65,41 @@ public class EmployeeController {
                         builder()
                         .status("SUCCESS")
                         .message("Employee Found")
+                        .data(response)
+                        .build());
+    }
+
+    @GetMapping("/managers")
+    public ResponseEntity<ApiResponse<List<EmployeeResponse>>>
+    getManagers() {
+
+        List<EmployeeResponse> response =
+                employeeService.getManagers();
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<EmployeeResponse>>
+                        builder()
+                        .status("SUCCESS")
+                        .message("Managers Fetched")
+                        .data(response)
+                        .build());
+    }
+
+    @GetMapping("/manager/{managerId}")
+    public ResponseEntity<ApiResponse<List<EmployeeResponse>>>
+    getEmployeesByManagerId(
+            @PathVariable Long managerId) {
+
+        List<EmployeeResponse> response =
+                employeeService.getEmployeesByManagerId(
+                        managerId);
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<EmployeeResponse>>
+                        builder()
+                        .status("SUCCESS")
+                        .message(
+                                "Team Members Fetched")
                         .data(response)
                         .build());
     }

@@ -1,11 +1,9 @@
-package com.gencpulse.auth.dto;
-
-import com.gencpulse.auth.entity.Role;
+package com.gencpulse.employee.dto;
 
 import lombok.Data;
 
 @Data
-public class RegisterRequest {
+public class RegisterRequestDto {
 
     private String username;
 

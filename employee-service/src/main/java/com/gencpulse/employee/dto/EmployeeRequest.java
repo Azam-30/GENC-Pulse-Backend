@@ -18,6 +18,12 @@ public class EmployeeRequest {
     @NotBlank(message = "Email is required")
     private String email;
 
+    @NotBlank(message = "Username is required")
+    private String username;
+
+    @NotBlank(message = "Password is required")
+    private String password;
+
     @NotBlank(message = "Role is required")
     private String role;
 
@@ -28,6 +34,8 @@ public class EmployeeRequest {
     private String location;
 
     private String batch;
+
+    private Long managerId;
 
     private String managerName;
 

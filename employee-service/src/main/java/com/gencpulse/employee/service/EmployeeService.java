@@ -7,15 +7,23 @@ import java.util.List;
 
 public interface EmployeeService {
 
-    EmployeeResponse createEmployee(EmployeeRequest request);
+    EmployeeResponse createEmployee(
+            EmployeeRequest request);
 
     List<EmployeeResponse> getAllEmployees();
 
-    EmployeeResponse getEmployeeById(Long id);
+    EmployeeResponse getEmployeeById(
+            Long id);
 
     EmployeeResponse updateEmployee(
             Long id,
             EmployeeRequest request);
 
-    void deleteEmployee(Long id);
+    void deleteEmployee(
+            Long id);
+
+    List<EmployeeResponse> getManagers();
+
+    List<EmployeeResponse> getEmployeesByManagerId(
+            Long managerId);
 }

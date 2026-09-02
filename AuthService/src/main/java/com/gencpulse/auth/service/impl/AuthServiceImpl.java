@@ -45,6 +45,8 @@ public class AuthServiceImpl
                                 request.getPassword()))
                 .role(
                         request.getRole())
+                .employeeId(
+                        request.getEmployeeId())
                 .active(true)
                 .build();
 
@@ -84,6 +86,8 @@ public class AuthServiceImpl
                         user.getUsername())
                 .role(
                         user.getRole().name())
+                .employeeId(
+                        user.getEmployeeId())
                 .build();
     }
 }

@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -25,7 +26,11 @@ public class Employee {
 
     private String email;
 
+    private String username;
+
     private String role;
+
+    private Long managerId;
 
     private String managerName;
 
@@ -36,7 +41,7 @@ public class Employee {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-    
+
     private String designation;
 
     private String technology;
@@ -48,13 +53,17 @@ public class Employee {
     @PrePersist
     public void prePersist() {
 
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        createdAt =
+                LocalDateTime.now();
+
+        updatedAt =
+                LocalDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
 
-        updatedAt = LocalDateTime.now();
+        updatedAt =
+                LocalDateTime.now();
     }
 }
