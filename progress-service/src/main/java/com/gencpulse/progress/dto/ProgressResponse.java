@@ -15,6 +15,10 @@ public class ProgressResponse {
     private Long id;
 
     private Long employeeId;
+    
+    private String employeeName;
+
+    private String employeeCode;
 
     private String storyId;
 
@@ -27,4 +31,6 @@ public class ProgressResponse {
     private String blockers;
 
     private LocalDate updateDate;
+    
+
 }

@@ -65,13 +65,6 @@ public class EmployeeServiceImpl
                                     new ResourceNotFoundException(
                                             "Manager not found"));
 
-            if (!"MANAGER".equalsIgnoreCase(
-                    manager.getRole())) {
-
-                throw new RuntimeException(
-                        "Selected employee is not a manager");
-            }
-
             employee.setManagerId(
                     manager.getId());
 
@@ -178,6 +171,13 @@ public class EmployeeServiceImpl
 
         if (request.getManagerId() != null) {
 
+            if (request.getManagerId()
+                    .equals(id)) {
+
+                throw new RuntimeException(
+                        "Employee cannot be their own manager");
+            }
+
             Employee manager =
                     repository.findById(
                             request.getManagerId())
@@ -185,23 +185,19 @@ public class EmployeeServiceImpl
                                     new ResourceNotFoundException(
                                             "Manager not found"));
 
-            if (!"MANAGER".equalsIgnoreCase(
-                    manager.getRole())) {
-
-                throw new RuntimeException(
-                        "Selected employee is not a manager");
-            }
-
             employee.setManagerId(
                     manager.getId());
 
             employee.setManagerName(
                     manager.getName());
+
         } else {
 
-            employee.setManagerId(null);
+            employee.setManagerId(
+                    null);
 
-            employee.setManagerName(null);
+            employee.setManagerName(
+                    null);
         }
 
         employee.setProjectName(
@@ -219,7 +215,8 @@ public class EmployeeServiceImpl
     }
 
     @Override
-    public void deleteEmployee(Long id) {
+    public void deleteEmployee(
+            Long id) {
 
         Employee employee =
                 repository.findById(id)
@@ -232,7 +229,8 @@ public class EmployeeServiceImpl
     }
 
     @Override
-    public List<EmployeeResponse> getManagers() {
+    public List<EmployeeResponse>
+    getManagers() {
 
         return repository.findByRole(
                         "MANAGER")

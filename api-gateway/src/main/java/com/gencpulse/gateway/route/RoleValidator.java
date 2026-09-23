@@ -20,7 +20,14 @@ public class RoleValidator {
 
             return path.startsWith("/api/progress")
                     || path.startsWith("/api/commits")
-                    || path.startsWith("/api/analytics");
+                    || path.startsWith("/api/analytics")
+
+                    // hierarchy endpoints
+                    || path.startsWith("/api/employees/manager/")
+                    || path.startsWith("/api/employees/managers")
+
+                    // profile lookup
+                    || path.matches("/api/employees/\\d+$");
         }
 
         if ("EMPLOYEE".equals(role)) {

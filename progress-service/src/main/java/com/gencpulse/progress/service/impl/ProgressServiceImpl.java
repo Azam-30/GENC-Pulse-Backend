@@ -1,11 +1,16 @@
 package com.gencpulse.progress.service.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.gencpulse.progress.client.EmployeeFeignClient;
+import com.gencpulse.progress.dto.ApiResponse;
+import com.gencpulse.progress.dto.EmployeeResponse;
 import com.gencpulse.progress.dto.ProgressRequest;
 import com.gencpulse.progress.dto.ProgressResponse;
 import com.gencpulse.progress.entity.Progress;
@@ -112,4 +117,66 @@ public class ProgressServiceImpl implements ProgressService {
                                 ProgressResponse.class))
                 .toList();
     }
+    
+    @Override
+    public List<ProgressResponse> getProgressByManagerId(
+            Long managerId) {
+
+        ApiResponse<List<EmployeeResponse>>
+                apiResponse =
+                employeeFeignClient
+                        .getEmployeesByManagerId(
+                                managerId);
+
+        List<EmployeeResponse> employees =
+                apiResponse.getData();
+
+        if (employees == null
+                || employees.isEmpty()) {
+
+            return List.of();
+        }
+
+        List<Long> employeeIds =
+                employees.stream()
+                        .map(EmployeeResponse::getId)
+                        .toList();
+
+        Map<Long, EmployeeResponse> employeeMap =
+                employees.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        EmployeeResponse::getId,
+                                        Function.identity()));
+
+        return repository
+                .findByEmployeeIdIn(
+                        employeeIds)
+                .stream()
+                .map(progress -> {
+
+                    ProgressResponse progressResponse =
+                            mapper.map(
+                                    progress,
+                                    ProgressResponse.class);
+
+                    EmployeeResponse employee =
+                            employeeMap.get(
+                                    progress.getEmployeeId());
+
+                    if (employee != null) {
+
+                        progressResponse.setEmployeeName(
+                                employee.getName());
+
+                        progressResponse.setEmployeeCode(
+                                employee.getEmployeeCode());
+                    }
+
+                    return progressResponse;
+
+                })
+                .toList();
+    }
+
 }

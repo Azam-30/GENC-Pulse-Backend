@@ -24,4 +24,7 @@ public interface CommitRepository
 
     long countByEmployeeId(
             Long employeeId);
+    
+    List<CommitEntity> findByEmployeeIdIn(
+            List<Long> employeeIds);
 }

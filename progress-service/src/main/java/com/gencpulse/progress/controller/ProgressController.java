@@ -50,4 +50,13 @@ public class ProgressController {
                 progressService.getProgressByEmployeeId(employeeId)
         );
     }
+    
+    @GetMapping("/manager/{managerId}")
+    public ResponseEntity<?> getByManagerId(
+            @PathVariable Long managerId) {
+
+        return ResponseEntity.ok(
+                progressService.getProgressByManagerId(
+                        managerId));
+    }
 }

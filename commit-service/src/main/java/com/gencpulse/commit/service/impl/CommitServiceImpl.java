@@ -2,13 +2,18 @@ package com.gencpulse.commit.service.impl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.gencpulse.commit.client.EmployeeFeignClient;
+import com.gencpulse.commit.dto.ApiResponse;
 import com.gencpulse.commit.dto.CommitRequest;
 import com.gencpulse.commit.dto.CommitResponse;
+import com.gencpulse.commit.dto.EmployeeResponse;
 import com.gencpulse.commit.entity.CommitEntity;
 import com.gencpulse.commit.repository.CommitRepository;
 import com.gencpulse.commit.service.CommitService;
@@ -140,5 +145,68 @@ public class CommitServiceImpl implements CommitService {
                 employeeId);
     }
 
+    @Override
+    public List<CommitResponse>
+    getCommitsByManagerId(
+            Long managerId) {
 
+        ApiResponse<List<EmployeeResponse>>
+                apiResponse =
+                employeeFeignClient
+                        .getEmployeesByManagerId(
+                                managerId);
+
+        List<EmployeeResponse> employees =
+                apiResponse.getData();
+
+        if (employees == null
+                || employees.isEmpty()) {
+
+            return List.of();
+        }
+
+        List<Long> employeeIds =
+                employees.stream()
+                        .map(EmployeeResponse::getId)
+                        .toList();
+
+        Map<Long, EmployeeResponse> employeeMap =
+                employees.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        EmployeeResponse::getId,
+                                        Function.identity()));
+
+        return repository
+                .findByEmployeeIdIn(
+                        employeeIds)
+                .stream()
+                .map(commit -> {
+
+                    CommitResponse commitResponse =
+                            mapper.map(
+                                    commit,
+                                    CommitResponse.class);
+
+                    EmployeeResponse employee =
+                            employeeMap.get(
+                                    commit.getEmployeeId());
+
+                    if (employee != null) {
+
+                        commitResponse
+                                .setEmployeeName(
+                                        employee.getName());
+
+                        commitResponse
+                                .setEmployeeCode(
+                                        employee.getEmployeeCode());
+                    }
+
+                    return commitResponse;
+
+                })
+                .toList();
+    }
+    
 }

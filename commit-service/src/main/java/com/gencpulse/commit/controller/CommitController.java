@@ -121,4 +121,13 @@ public class CommitController {
                         employeeId)
         );
     }
+    @GetMapping("/manager/{managerId}")
+    public ResponseEntity<?> getByManagerId(
+            @PathVariable Long managerId) {
+
+        return ResponseEntity.ok(
+                commitService
+                        .getCommitsByManagerId(
+                                managerId));
+    }
 }

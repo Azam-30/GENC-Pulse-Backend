@@ -14,6 +14,10 @@ public class CommitResponse {
 
     private Long employeeId;
 
+    private String employeeName;
+
+    private String employeeCode;
+
     private String commitHash;
 
     private String repositoryName;

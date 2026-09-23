@@ -17,4 +17,7 @@ public interface ProgressService {
 
     List<ProgressResponse> getProgressByEmployeeId(
             Long employeeId);
+    
+    List<ProgressResponse> getProgressByManagerId(
+            Long managerId);
 }

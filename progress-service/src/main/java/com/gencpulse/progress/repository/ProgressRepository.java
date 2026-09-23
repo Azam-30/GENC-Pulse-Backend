@@ -24,4 +24,8 @@ public interface ProgressRepository
     List<Progress> findByUpdateDate(
             LocalDate updateDate);
     
+    List<Progress> findByEmployeeIdIn(
+            List<Long> employeeIds);
+
+    
 }

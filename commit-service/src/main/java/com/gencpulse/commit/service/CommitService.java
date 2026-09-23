@@ -27,4 +27,7 @@ public interface CommitService {
 
     long getCommitCountByEmployee(
             Long employeeId);
+    List<CommitResponse>
+    getCommitsByManagerId(
+            Long managerId);
 }
